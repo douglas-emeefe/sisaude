@@ -19,9 +19,9 @@
     padding: 0px;
 }
 
-.login-left:hover {
+/* .login-left:hover {
     background-color: rgb(101, 179, 43);
-}
+} */
 
 .system-name {
     font-size: 40px;
@@ -58,9 +58,9 @@
     margin-bottom: 5px;
 }
 
-.login-box h2:hover {
+/* .login-box h2:hover {
     color: rgb(101, 179, 43);
-}
+} */
 
 .subtitle {
     font-size: 14px;
