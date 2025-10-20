@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Login.css";
+import logo from "../images/logo-hrl.png";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -41,15 +42,16 @@ export default function Login() {
 
             <div className="login-right">
                 <div className="login-box">
+                    <img src={logo} alt="Logo SISAUDE" className="logo" />
                     <h2>Bem-vindo</h2>
                     <p className="subtitle">Faça login para acessar o sistema</p>
 
                     <form onSubmit={handleSubmit}>
-                        <label htmlFor="email">E-mail</label>
+                        <label htmlFor="email">Usuário</label>
                         <input
                             id="email"
                             type="email"
-                            placeholder="Digite seu e-mail"
+                            placeholder="Digite seu Usuário"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required

@@ -9,13 +9,18 @@
 /* === Lado esquerdo === */
 .login-left {
     flex: 1;
-    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    /* background: linear-gradient(135deg, #1d4ed8, #3b82f6); */
+    background-color: rgb(10, 81, 159);;
     color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 0px;
+}
+
+.login-left:hover {
+    background-color: rgb(101, 179, 43);
 }
 
 .system-name {
@@ -32,7 +37,7 @@
 
 /* === Lado direito === */
 .login-right {
-    flex: 1;
+    flex: 3;
     background-color: #f9fafc;
     display: flex;
     justify-content: center;
@@ -43,14 +48,18 @@
     background: #ffffff;
     padding: 40px 50px;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     width: 380px;
     text-align: center;
 }
 
 .login-box h2 {
-    color: #1e3a8a;
+    color: rgb(10, 81, 159);
     margin-bottom: 5px;
+}
+
+.login-box h2:hover {
+    color: rgb(101, 179, 43);
 }
 
 .subtitle {
@@ -88,18 +97,20 @@ input:focus {
 }
 
 button {
-    background-color: #2563eb;
+    background-color: rgb(10, 81, 159);;
     color: white;
     border: none;
     border-radius: 6px;
     padding: 10px;
     font-size: 16px;
+    font-family: inherit;
+    font-weight: 500;
     cursor: pointer;
     transition: 0.3s;
 }
 
 button:hover {
-    background-color: #1e3a8a;
+    background-color: rgb(101, 179, 43);
 }
 
 /* === Mensagem de erro === */
@@ -130,4 +141,9 @@ button:hover {
         width: 90%;
         padding: 30px 20px;
     }
+}
+
+.logo {
+    width: 60px;
+    /* margin-bottom: 5px; */
 }
