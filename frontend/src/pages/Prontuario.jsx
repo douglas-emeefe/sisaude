@@ -5,16 +5,17 @@ const Prontuario = () => {
     const [activeTab, setActiveTab] = useState("dadosPessoais");
     const [dataNascimento, setDataNascimento] = useState("");
     const [idade, setIdade] = useState("");
-    const [indigena, setIndigena] = useState(false);
     const [sexo, setSexo] = useState("");
     const [residente, setResidente] = useState("");
-    const [raca, setRaca] = useState({
-        preto: false,
-        pardo: false,
-        amarelo: false,
-        indigena: false,
-    });
+    const [raca, setRaca] = useState("");
+    const [etnia, setEtnia] = useState("");
 
+    // Estados de documentos
+    const [cpf, setCpf] = useState("");
+    const [sus, setSus] = useState("");
+    const [cpfValido, setCpfValido] = useState(true);
+
+    // --- Funções de cálculo de idade ---
     const calcularIdade = (data) => {
         const hoje = new Date();
         const nascimento = new Date(data);
@@ -47,9 +48,79 @@ const Prontuario = () => {
         setIdade(valor ? calcularIdade(valor) : "");
     };
 
-    const handleRacaChange = (e) => {
-        const { name, checked } = e.target;
-        setRaca((prev) => ({ ...prev, [name]: checked }));
+    // --- Funções de formatação ---
+    const formatCPF = (value) => {
+        const digits = value.replace(/\D/g, "").slice(0, 11);
+        if (digits.length <= 3) return digits;
+        if (digits.length <= 6) return digits.replace(/(\d{3})(\d+)/, "$1.$2");
+        if (digits.length <= 9) return digits.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
+        return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, "$1.$2.$3-$4");
+    };
+
+    const formatSUS = (value) => {
+        const digits = value.replace(/\D/g, "");
+        if (digits.length <= 11) {
+            // Pode ser CPF
+            return formatCPF(digits);
+        } else {
+            // SUS antigo
+            const susDigits = digits.slice(0, 15);
+            const groups = susDigits.match(/.{1,4}/g);
+            return groups ? groups.join(" ") : "";
+        }
+    };
+
+    // --- Função de validação de CPF ---
+    const validarCPF = (cpf) => {
+        const digits = cpf.replace(/\D/g, "");
+        if (digits.length !== 11) return false;
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(digits.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10) resto = 0;
+        if (resto !== parseInt(digits.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(digits.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10) resto = 0;
+        if (resto !== parseInt(digits.charAt(10))) return false;
+
+        return true;
+    };
+
+    const handleCpfChange = (e) => {
+        const valor = e.target.value;
+        const formatted = formatCPF(valor);
+        setCpf(formatted);
+        setCpfValido(validarCPF(formatted));
+        // Se o SUS estiver vazio, preenche automaticamente com o mesmo número
+        if (!sus) setSus(formatted);
+    };
+
+    const handleSusChange = (e) => {
+        const valor = e.target.value;
+        const digits = valor.replace(/\D/g, "");
+
+        let formatted;
+        if (digits.length <= 11) {
+            // SUS digitado como CPF
+            formatted = formatCPF(digits);
+            setSus(formatted);
+
+            // Atualiza o CPF somente se não estiver digitado pelo usuário
+            if (!cpf || cpf === sus) {
+                setCpf(formatted);
+                setCpfValido(validarCPF(formatted));
+            }
+        } else {
+            // SUS antigo
+            const susDigits = digits.slice(0, 15);
+            const groups = susDigits.match(/.{1,4}/g);
+            formatted = groups ? groups.join(" ") : "";
+            setSus(formatted);
+            // Não toca no CPF
+        }
     };
 
     return (
@@ -65,14 +136,14 @@ const Prontuario = () => {
                     Dados Pessoais
                 </button>
 
-                <button 
+                <button
                     className={activeTab === "documentos" ? "active" : ""}
                     onClick={() => setActiveTab("documentos")}
                 >
                     Documentos
                 </button>
 
-                <button 
+                <button
                     className={activeTab === "endereco" ? "active" : ""}
                     onClick={() => setActiveTab("endereco")}
                 >
@@ -83,9 +154,10 @@ const Prontuario = () => {
             <form className="prontuario-form">
                 {activeTab === "dadosPessoais" && (
                     <>
+                        {/* Dados Pessoais existentes */}
                         <div className="form-row">
                             <div className="form-group">
-                                <label>NOME COMPLETO</label>
+                                <label>NOME COMPLETO DO PACIENTE</label>
                                 <input type="text" placeholder="Digite o nome completo" />
                             </div>
 
@@ -101,46 +173,9 @@ const Prontuario = () => {
                                 <input type="text" placeholder="Digite o nome do acompanhante" />
                             </div>
 
-                            
-                        </div>
-
-                        <div className="form-row">
-                            
-
                             <div className="form-group">
-                                <label>SEXO</label>
-                                <div className="checkbox-group">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="sexo"
-                                            value="masculino"
-                                            checked={sexo === "masculino"}
-                                            onChange={(e) => setSexo(e.target.value)}
-                                        />{" "}
-                                        M
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="sexo"
-                                            value="feminino"
-                                            checked={sexo === "feminino"}
-                                            onChange={(e) => setSexo(e.target.value)}
-                                        />{" "}
-                                        F
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="sexo"
-                                            value="outros"
-                                            checked={sexo === "outros"}
-                                            onChange={(e) => setSexo(e.target.value)}
-                                        />{" "}
-                                        Outros
-                                    </label>
-                                </div>
+                                <label>PROFISSÃO</label>
+                                <input type="text" placeholder="Digite a profissão" />
                             </div>
                         </div>
 
@@ -162,85 +197,39 @@ const Prontuario = () => {
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label>PROFISSÃO</label>
-                                <input type="text" placeholder="Digite a profissão" />
-                            </div>
-
-                            <div className="form-group">
-                                <label>RAÇA/COR</label>
-                                <div className="checkbox-group">
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="preto"
-                                            checked={raca.preto}
-                                            onChange={handleRacaChange}
-                                        />{" "}
-                                        Preto
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="pardo"
-                                            checked={raca.pardo}
-                                            onChange={handleRacaChange}
-                                        />{" "}
-                                        Pardo
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="amarelo"
-                                            checked={raca.amarelo}
-                                            onChange={handleRacaChange}
-                                        />{" "}
-                                        Amarelo
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="indigena"
-                                            checked={raca.indigena}
-                                            onChange={handleRacaChange}
-                                        />{" "}
-                                        Indígena
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>INDÍGENA</label>
+                                <label>SEXO</label>
                                 <div className="checkbox-group">
                                     <label>
                                         <input
                                             type="radio"
-                                            name="indigena"
-                                            value="sim"
-                                            checked={indigena === true}
-                                            onChange={() => setIndigena(true)}
+                                            name="sexo"
+                                            value="masculino"
+                                            checked={sexo === "masculino"}
+                                            onChange={(e) => setSexo(e.target.value)}
                                         />{" "}
-                                        Sim
+                                        MASCULINO
                                     </label>
                                     <label>
                                         <input
                                             type="radio"
-                                            name="indigena"
-                                            value="nao"
-                                            checked={indigena === false}
-                                            onChange={() => setIndigena(false)}
+                                            name="sexo"
+                                            value="feminino"
+                                            checked={sexo === "feminino"}
+                                            onChange={(e) => setSexo(e.target.value)}
                                         />{" "}
-                                        Não
+                                        FEMININO
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="sexo"
+                                            value="outros"
+                                            checked={sexo === "outros"}
+                                            onChange={(e) => setSexo(e.target.value)}
+                                        />{" "}
+                                        OUTROS
                                     </label>
                                 </div>
-
-                                {indigena && (
-                                    <>
-                                        <label>QUAL ETNIA</label>
-                                        <input type="text" placeholder="Informe a etnia" />
-                                    </>
-                                )}
                             </div>
 
                             <div className="form-group">
@@ -254,7 +243,7 @@ const Prontuario = () => {
                                             checked={residente === "sim"}
                                             onChange={(e) => setResidente(e.target.value)}
                                         />{" "}
-                                        Sim
+                                        SIM
                                     </label>
                                     <label>
                                         <input
@@ -264,10 +253,79 @@ const Prontuario = () => {
                                             checked={residente === "nao"}
                                             onChange={(e) => setResidente(e.target.value)}
                                         />{" "}
-                                        Não
+                                        NÃO
                                     </label>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>RAÇA/COR</label>
+                                <div className="checkbox-group">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="raca"
+                                            value="branco"
+                                            checked={raca === "branco"}
+                                            onChange={(e) => setRaca(e.target.value)}
+                                        />{" "}
+                                        Branco
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="raca"
+                                            value="preto"
+                                            checked={raca === "preto"}
+                                            onChange={(e) => setRaca(e.target.value)}
+                                        />{" "}
+                                        Preto
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="raca"
+                                            value="pardo"
+                                            checked={raca === "pardo"}
+                                            onChange={(e) => setRaca(e.target.value)}
+                                        />{" "}
+                                        Pardo
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="raca"
+                                            value="amarelo"
+                                            checked={raca === "amarelo"}
+                                            onChange={(e) => setRaca(e.target.value)}
+                                        />{" "}
+                                        Amarelo
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="raca"
+                                            value="indigena"
+                                            checked={raca === "indigena"}
+                                            onChange={(e) => setRaca(e.target.value)}
+                                        />{" "}
+                                        Indígena
+                                    </label>
+                                </div>
+                            </div>
+                            {raca === "indigena" && (
+                                <div className="form-group">
+                                    <label>QUAL ETNIA</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Informe a etnia"
+                                        value={etnia}
+                                        onChange={(e) => setEtnia(e.target.value)}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
@@ -277,12 +335,27 @@ const Prontuario = () => {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>CPF</label>
-                                <input type="text" placeholder="Digite o CPF" />
+                                <input
+                                    type="text"
+                                    placeholder="Digite o CPF"
+                                    value={cpf}
+                                    onChange={handleCpfChange}
+                                />
+                                {!cpfValido && cpf.length > 0 && (
+                                    <span style={{ color: "red", fontSize: "0.8rem" }}>
+                                        CPF inválido
+                                    </span>
+                                )}
                             </div>
 
                             <div className="form-group">
                                 <label>CARTÃO DO SUS</label>
-                                <input type="text" placeholder="Digite o cartão do SUS" />
+                                <input
+                                    type="text"
+                                    placeholder="Digite o cartão do SUS"
+                                    value={sus}
+                                    onChange={handleSusChange}
+                                />
                             </div>
                         </div>
                     </>
@@ -291,21 +364,37 @@ const Prontuario = () => {
                 {activeTab === "endereco" && (
                     <>
                         <div className="form-row">
-                            <div className="form-group full-width">
-                                <label>ENDEREÇO (RUA, NÚMERO, BAIRRO)</label>
-                                <input type="text" placeholder="Digite o endereço" />
+                            <div className="form-group">
+                                <label>RUA</label>
+                                <input type="text" placeholder="Digite o nome da Rua" />
+                            </div>
+
+                            <div className="form-group">
+                                <label>NÚMERO</label>
+                                <input type="text" placeholder="Digite o Número da Residêndia" />
+                            </div>
+                            <div className="form-group">
+                                <label>BAIRRO</label>
+                                <input type="text" placeholder="Digite o nome do Bairro" />
                             </div>
                         </div>
+                        <button
+                            type="button"
+                            className="cadastrar-btn"
+                            onClick={() => alert("Paciente cadastrado!")}
+                        >
+                            Cadastrar Paciente
+                        </button>
                     </>
                 )}
 
-                <button
-                    type="button"
-                    className="cadastrar-btn"
-                    onClick={() => alert("Paciente cadastrado!")}
-                >
-                    Cadastrar Paciente
-                </button>
+                {/* <button
+          type="button"
+          className="cadastrar-btn"
+          onClick={() => alert("Paciente cadastrado!")}
+        >
+          Cadastrar Paciente
+        </button> */}
             </form>
         </div>
     );

@@ -7,9 +7,7 @@ body {
 
 .prontuario-container {
     height: 100vh;
-    /* ocupa toda a tela */
-    overflow: hidden;
-    /* remove rolagem */
+    overflow: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -75,14 +73,14 @@ button {
     padding: 12px;
     border-radius: 5px;
     border: none;
-    background-color: #007bff;
+    background-color: rgb(10, 81, 159);
     color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: rgb(101, 179, 43);
 }
 
 .prontuario-container {
@@ -110,6 +108,6 @@ button:hover {
 }
 
 .tabs button.active {
-  background-color: #007bff;
+  background-color: rgb(10, 81, 159);
   color: white;
 }
