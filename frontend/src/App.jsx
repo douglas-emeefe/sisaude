@@ -8,11 +8,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Prontuario />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/prontuario" element={<Prontuario />} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
-

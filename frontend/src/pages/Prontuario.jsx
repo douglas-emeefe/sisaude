@@ -123,6 +123,52 @@ const Prontuario = () => {
         }
     };
 
+    const handleCadastrar = async () => {
+        const paciente = {
+            nome: document.querySelector('input[placeholder="Digite o nome completo"]').value,
+            nomeMae: document.querySelector('input[placeholder="Digite o nome da mãe"]').value,
+            nomeAcompanhante: document.querySelector('input[placeholder="Digite o nome do acompanhante"]').value,
+            profissao: document.querySelector('input[placeholder="Digite a profissão"]').value,
+            dataNascimento,
+            sexo,
+            residente,
+            raca,
+            etnia,
+            cpf,
+            sus,
+            rua: document.querySelector('input[placeholder="Digite o nome da Rua"]').value,
+            numero: document.querySelector('input[placeholder="Digite o Número da Residêndia"]').value,
+            bairro: document.querySelector('input[placeholder="Digite o nome do Bairro"]').value,
+        };
+
+        try {
+            const resposta = await fetch("http://localhost:3000/api/pacientes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(paciente),
+            });
+
+            if (!resposta.ok) {
+                const erro = await resposta.json();
+                alert("Erro ao cadastrar paciente: " + erro.erro);
+                return;
+            }
+
+            const dados = await resposta.json();
+            alert("✅ Paciente cadastrado com sucesso!");
+            console.log("Paciente cadastrado:", dados);
+
+            // opcional: limpar o formulário
+            window.location.reload();
+        } catch (erro) {
+            console.error("Erro ao cadastrar paciente:", erro);
+            alert("Erro de conexão com o servidor.");
+        }
+    };
+
+
     return (
         <div className="prontuario-container">
             <h2>Prontuário do Paciente</h2>
@@ -381,10 +427,12 @@ const Prontuario = () => {
                         <button
                             type="button"
                             className="cadastrar-btn"
-                            onClick={() => alert("Paciente cadastrado!")}
+                            onClick={handleCadastrar}
                         >
                             Cadastrar Paciente
                         </button>
+
+
                     </>
                 )}
 

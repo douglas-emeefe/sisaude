@@ -91,13 +91,13 @@ input {
 }
 
 input:focus {
-    border-color: #2563eb;
+    border-color: rgb(10, 81, 159);
     outline: none;
     box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
 }
 
 button {
-    background-color: rgb(10, 81, 159);;
+    background-color: rgb(10, 81, 159);
     color: white;
     border: none;
     border-radius: 6px;

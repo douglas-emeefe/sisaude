@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "../styles/Login.css";
 import logo from "../images/logo-hrl.png";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const [erro, setErro] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,7 +28,7 @@ export default function Login() {
             }
 
             localStorage.setItem("token", data.token);
-            window.location.href = "/dashboard";
+            navigate("/prontuario");
         } catch (error) {
             console.error("Erro:", error);
             setErro("Erro ao conectar ao servidor.");
